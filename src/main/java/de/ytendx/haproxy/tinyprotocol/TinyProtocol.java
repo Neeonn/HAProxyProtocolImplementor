@@ -101,7 +101,12 @@ public class TinyProtocol {
 					}
 
 					// Adding the decoder to the pipeline
-					channel.pipeline().addAfter("timeout", "haproxy-decoder", new HAProxyMessageDecoder());
+					if (channel.pipeline().get("timeout") != null) {
+						channel.pipeline().addAfter("timeout", "haproxy-decoder", new HAProxyMessageDecoder());
+					} else {
+						channel.pipeline().addLast("haproxy-decoder", new HAProxyMessageDecoder());
+					}
+
 					// Adding the proxy message handler to the pipeline too
 					channel.pipeline().addAfter("haproxy-decoder", "haproxy-handler", HAPROXY_MESSAGE_HANDLER);
 				} catch (Exception e) {
